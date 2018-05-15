@@ -8,3 +8,5 @@
 /build
 /captures
 .externalNativeBuild
+*.xml___jb_old___
+.idea/vcs.xml
