@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Baking App</string>
     <string name="cake_description">this is a cake icon</string>
+    <string name="recipe_steps">Recipe Steps</string>
     <string name="connection_required">You need internet connection in order to use this app.</string>
+    <string name="chef_hat">chef hat</string>
 </resources>

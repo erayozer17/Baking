@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    repositories {
+        jcenter()
+        google()
+    }
 }
 
 dependencies {
@@ -30,5 +34,8 @@ dependencies {
     //lombok
     compileOnly 'org.projectlombok:lombok:1.16.20'
     annotationProcessor 'org.projectlombok:lombok:1.16.20'
-    //
+    //exoplayer
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.7.1'
 }

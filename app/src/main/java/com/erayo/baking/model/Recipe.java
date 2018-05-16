@@ -21,10 +21,10 @@ public class Recipe implements Parcelable{
     private Recipe(Parcel in){
         id = in.readInt();
         name = in.readString();
-        ingredients = in.readArrayList(Ingredients.class.getClassLoader());
-        steps = in.readArrayList(Step.class.getClassLoader());
         servings = in.readInt();
         image = in.readString();
+        ingredients = in.readArrayList(Ingredients.class.getClassLoader());
+        steps = in.readArrayList(Step.class.getClassLoader());
     }
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
