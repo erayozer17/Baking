@@ -75,7 +75,7 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void determineWhichWillBeVisible(){
-        if (step.getVideoUrl().equals("")){
+        if (step.getVideoUrl().equals("") && step.getThumbnailUrl().equals("")){
             simpleExoPlayerView.setVisibility(View.GONE);
             imageViewIfVideoNotProvided.setVisibility(View.VISIBLE);
         } else {
@@ -100,7 +100,9 @@ public class StepDetailFragment extends Fragment {
 
         DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(step.getVideoUrl()),
+        String url = step.getVideoUrl().equals("") ? step.getThumbnailUrl() : step.getVideoUrl();
+
+        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(url),
                 mediaDataSourceFactory, extractorsFactory, null, null);
 
         player.prepare(mediaSource);

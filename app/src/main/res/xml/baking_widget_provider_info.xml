@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialKeyguardLayout="@layout/baking_widget_provider"
+    android:configure="com.erayo.baking.WidgetActiviy"
+    android:initialLayout="@layout/baking_widget_provider"
+    android:minHeight="200dp"
+    android:minWidth="200dp"
+    android:previewImage="@drawable/cake"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen">
+</appwidget-provider>

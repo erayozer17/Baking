@@ -73,7 +73,7 @@ public class RecipeStepsFragment extends Fragment {
 
     private void initRecyclerView(){
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         RecipeStepsRecyclerAdapter recipeStepsRecyclerAdapter =
                 new RecipeStepsRecyclerAdapter(steps, new RecipeStepsRecyclerAdapter.ClickListener() {
                     @Override
