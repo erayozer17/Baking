@@ -38,4 +38,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.7.1'
+    //butterknife
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

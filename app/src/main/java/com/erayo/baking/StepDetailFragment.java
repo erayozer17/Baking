@@ -29,9 +29,13 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class StepDetailFragment extends Fragment {
 
-    private SimpleExoPlayerView simpleExoPlayerView;
+    @BindView(R.id.player_view)
+    SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
 
     private Timeline.Window window;
@@ -40,7 +44,10 @@ public class StepDetailFragment extends Fragment {
     private boolean shouldAutoPlay;
     private BandwidthMeter bandwidthMeter;
 
-    private ImageView imageViewIfVideoNotProvided;
+    @BindView(R.id.imageView)
+    ImageView imageViewIfVideoNotProvided;
+    @BindView(R.id.step_long_description_tv)
+    TextView tv;
     private Step step;
 
     public StepDetailFragment(){}
@@ -54,8 +61,8 @@ public class StepDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ButterKnife.bind(this, view);
         step = getArguments().getParcelable("step");
-        TextView tv = view.findViewById(R.id.step_long_description_tv);
         tv.setText(step.description);
 
         shouldAutoPlay = true;
@@ -63,9 +70,6 @@ public class StepDetailFragment extends Fragment {
         mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(),
                 "mediaPlayerSample"), (TransferListener<? super DataSource>) bandwidthMeter);
         window = new Timeline.Window();
-
-        imageViewIfVideoNotProvided = view.findViewById(R.id.imageView);
-        simpleExoPlayerView = view.findViewById(R.id.player_view);
 
         determineWhichWillBeVisible();
 

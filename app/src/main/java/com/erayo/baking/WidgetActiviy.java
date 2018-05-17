@@ -24,10 +24,14 @@ import com.erayo.baking.model.Recipe;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class WidgetActiviy extends AppCompatActivity implements JsonProvider.Callback, MainScreenRecyclerViewAdapter.ClickListener {
 
     static List<Recipe> recipes = new ArrayList<>();
 
+    @BindView(R.id.widget_rv)
     RecyclerView recyclerView;
     MainScreenRecyclerViewAdapter recyclerViewAdapter;
     RemoteViews remoteViews;
@@ -43,7 +47,7 @@ public class WidgetActiviy extends AppCompatActivity implements JsonProvider.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_widget);
 
-        recyclerView = findViewById(R.id.widget_rv);
+        ButterKnife.bind(this);
         remoteViews = new RemoteViews(this.getPackageName(), R.layout.baking_widget_provider);
         widgetManager = AppWidgetManager.getInstance(this);
 

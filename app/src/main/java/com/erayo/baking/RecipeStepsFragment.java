@@ -21,9 +21,15 @@ import com.erayo.baking.model.Step;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RecipeStepsFragment extends Fragment {
 
-    private RecyclerView recyclerView;
+    @BindView(R.id.recipe_steps_rv)
+    RecyclerView recyclerView;
+    @BindView(R.id.ingredients_tv)
+    TextView tv_ingredients;
     List<Step> steps;
     public RecipeStepsFragment(){}
 
@@ -37,11 +43,10 @@ public class RecipeStepsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ButterKnife.bind(this, view);
         List<Ingredients> ingredients;
         Recipe recipe = getArguments().getParcelable("recipe");
         steps = recipe.getSteps();
-        recyclerView = view.findViewById(R.id.recipe_steps_rv);
-        TextView tv_ingredients = view.findViewById(R.id.ingredients_tv);
         initRecyclerView();
         
         ingredients = recipe.getIngredients();
