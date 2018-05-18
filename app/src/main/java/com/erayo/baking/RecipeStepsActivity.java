@@ -10,6 +10,7 @@ import com.erayo.baking.model.Recipe;
 public class RecipeStepsActivity extends AppCompatActivity {
 
     static Recipe recipe;
+    private static final String RECIPE_LIST = "recipe_list";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,17 @@ public class RecipeStepsActivity extends AppCompatActivity {
         RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
         recipeStepsFragment.setArguments(b);
         FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().add(R.id.frame_layout_steps, recipeStepsFragment).commit();
+        if (savedInstanceState == null){
+            fm.beginTransaction().add(R.id.frame_layout_steps, recipeStepsFragment).commit();
+        }
+        else {
+            fm.beginTransaction().replace(R.id.frame_layout_steps, recipeStepsFragment).commit();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(RECIPE_LIST, recipe);
+        super.onSaveInstanceState(outState);
     }
 }
