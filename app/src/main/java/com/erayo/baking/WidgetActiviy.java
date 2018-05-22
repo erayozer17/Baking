@@ -51,27 +51,29 @@ public class WidgetActiviy extends AppCompatActivity implements JsonProvider.Cal
         remoteViews = new RemoteViews(this.getPackageName(), R.layout.baking_widget_provider);
         widgetManager = AppWidgetManager.getInstance(this);
 
-        if (recipes.size() == 0){
+        if (recipes.size() == 0) {
             if (isConnected()) {
                 new JsonProvider(this).execute(BuildConfig.BakingAppUrl);
-            }
-            else {
+            } else {
                 Toast.makeText(this,
                         getResources().getString(R.string.connection_required),
                         Toast.LENGTH_LONG).show();
+                finish();
             }
         } else {
             setUpRecyclerView();
         }
 
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID);
-        }
-        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            finish();
+        if (isConnected()) {
+            Intent intent = getIntent();
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        AppWidgetManager.INVALID_APPWIDGET_ID);
+            }
+            if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+                finish();
+            }
         }
     }
 
@@ -81,7 +83,7 @@ public class WidgetActiviy extends AppCompatActivity implements JsonProvider.Cal
         List<Ingredients> ingredients = recipe.getIngredients();
         StringBuilder builder = new StringBuilder();
         builder.append(recipe.getName()).append("\n\n");
-        for (Ingredients ing:ingredients) {
+        for (Ingredients ing : ingredients) {
             builder.append(String.valueOf(ing.getQuantity()))
                     .append(" ")
                     .append(ing.getMeasure())
@@ -104,7 +106,7 @@ public class WidgetActiviy extends AppCompatActivity implements JsonProvider.Cal
         setUpRecyclerView();
     }
 
-    private void setUpRecyclerView(){
+    private void setUpRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), DividerItemDecoration.VERTICAL));
         recyclerViewAdapter = new MainScreenRecyclerViewAdapter(recipes, this, this);
