@@ -68,6 +68,8 @@ public class RecipeStepsFragment extends Fragment {
         if(savedInstanceState != null){
             recyclerView.scrollToPosition(savedInstanceState.getInt("position"));
         }
+        StepDetailFragment.mVideoPosition = 0;
+        StepDetailFragment.isAlreadyPlaying = false;
     }
 
     @Override

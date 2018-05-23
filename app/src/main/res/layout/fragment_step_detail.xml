@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:srcCompat="@android:drawable/btn_dialog"
+            android:contentDescription="@string/chef_hat"
             android:src="@drawable/chef_hat"/>
 
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
