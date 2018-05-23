@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,7 +85,7 @@ public class StepDetailFragment extends Fragment {
         step = getArguments().getParcelable("step");
 
         tv.setText(step.description);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (isLandscape() && !isVideoNotProvided()) {
             if (getActivity() != null) {
                 hideSystemUI();
                 float[] screenSize = getScreenSize(getActivity());
@@ -115,13 +116,30 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void determineWhichWillBeVisible() {
-        if (step.getVideoUrl().equals("") && step.getThumbnailUrl().equals("")) {
+        if (isVideoNotProvided()) {
             simpleExoPlayerView.setVisibility(View.GONE);
             imageViewIfVideoNotProvided.setVisibility(View.VISIBLE);
+            if (isLandscape()){
+                imageViewIfVideoNotProvided.setVisibility(View.GONE);
+                tv.setVisibility(View.VISIBLE);
+                //float[] screenSize = getScreenSize(getActivity());
+                //tv.setGravity(Gravity.CENTER);
+            }
         } else {
             simpleExoPlayerView.setVisibility(View.VISIBLE);
             imageViewIfVideoNotProvided.setVisibility(View.GONE);
+            if (isLandscape()){
+                tv.setVisibility(View.GONE);
+            }
         }
+    }
+
+    private boolean isVideoNotProvided() {
+        return step.getVideoUrl().equals("") && step.getThumbnailUrl().equals("");
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private void initializePlayer() {

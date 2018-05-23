@@ -2,6 +2,7 @@ package com.erayo.baking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class RecipeStepsFragment extends Fragment {
+
+    private static final String POSITION = "position";
 
     @BindView(R.id.recipe_steps_rv)
     RecyclerView recyclerView;
@@ -66,7 +69,8 @@ public class RecipeStepsFragment extends Fragment {
         }
         tv_ingredients.setText(ingredientsAppended);
         if(savedInstanceState != null){
-            recyclerView.scrollToPosition(savedInstanceState.getInt("position"));
+            int position = (int)savedInstanceState.getFloat(POSITION);
+            recyclerView.scrollToPosition(position);
         }
         StepDetailFragment.mVideoPosition = 0;
         StepDetailFragment.isAlreadyPlaying = false;
@@ -74,7 +78,7 @@ public class RecipeStepsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putInt("position", recyclerView.getVerticalScrollbarPosition());
+        outState.putFloat(POSITION, recyclerView.getY());
         super.onSaveInstanceState(outState);
     }
 

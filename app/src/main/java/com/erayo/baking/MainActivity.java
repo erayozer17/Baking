@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +25,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements JsonProvider.Callback, MainScreenRecyclerViewAdapter.ClickListener{
 
     static List<Recipe> recipes = new ArrayList<>();
+    private static final String RECIPES_LIST = "recipes_list";
 
     @BindView(R.id.main_recycler_view)
     RecyclerView recyclerView;
@@ -35,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements JsonProvider.Call
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        if (savedInstanceState != null)
+            recipes = savedInstanceState.getParcelableArrayList(RECIPES_LIST);
 
         if (recipes.size() == 0){
             if (isConnected()) {
@@ -81,5 +86,11 @@ public class MainActivity extends AppCompatActivity implements JsonProvider.Call
         if (connectivityManager != null)
             activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(RECIPES_LIST, (ArrayList<? extends Parcelable>) recipes);
     }
 }
