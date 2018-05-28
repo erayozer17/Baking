@@ -12,10 +12,14 @@ public class RecipeStepsActivity extends AppCompatActivity {
     static Recipe recipe;
     private static final String RECIPE_LIST = "recipe_list";
 
+    public boolean isTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_steps);
+
+        isTwoPane = findViewById(R.id.mt_dt_steps_frame) != null;
 
         if (StepDetailActivity.SDA_TAG.equals(StepDetailActivity.NEGATIVE))
             recipe = getIntent().getParcelableExtra("recipe");

@@ -2,6 +2,7 @@ package com.erayo.baking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.erayo.baking.model.Ingredients;
 import com.erayo.baking.model.Recipe;
 import com.erayo.baking.model.Step;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -88,8 +90,9 @@ public class RecipeStepsFragment extends Fragment {
                     @Override
                     public void onItemClick(int clickedItemPosition) {
                         Intent intentToStepDetail = new Intent(getActivity(), StepDetailActivity.class);
-                        Step step = steps.get(clickedItemPosition);
-                        intentToStepDetail.putExtra("step", step);
+                        intentToStepDetail.putParcelableArrayListExtra("steps", (ArrayList<? extends Parcelable>) steps);
+                        intentToStepDetail.putExtra("clickedItemPosition", clickedItemPosition);
+                        StepDetailFragment.TAG = StepDetailFragment.EXTERNAL;
                         startActivity(intentToStepDetail);
                     }
                 }, getContext());

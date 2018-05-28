@@ -34,13 +34,20 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class StepDetailFragment extends Fragment {
 
     private final static String CURRENT_VIDEO_SECOND = "CURRENT_VIDEO_SECOND";
     private final static String IS_VIDEO_PLAYING = "IS_VIDEO_PLAYING";
+    public final static String EXTERNAL = "external";
+    public final static String INTERNAL = "internal";
+    public static String TAG;
+
 
     @BindView(R.id.player_view)
     SimpleExoPlayerView simpleExoPlayerView;
@@ -56,12 +63,20 @@ public class StepDetailFragment extends Fragment {
 
     @BindView(R.id.imageView)
     ImageView imageViewIfVideoNotProvided;
+    @BindView(R.id.nextStepButton)
+    ImageView nextStepButton;
+    @BindView(R.id.previousStepButton)
+    ImageView previousStepButton;
 
     @Nullable
     @BindView(R.id.step_long_description_tv)
-    TextView tv;
+    TextView stepDetailDesc_tv;
+    @BindView(R.id.stepNumber_tv)
+    TextView stepNumber_tv;
 
     private Step step;
+    private static List<Step> stepList;
+    private static int clickedItemPosition;
 
     public StepDetailFragment() {
     }
@@ -81,9 +96,93 @@ public class StepDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ButterKnife.bind(this, view);
-        step = getArguments().getParcelable("step");
+        if (TAG.equals(EXTERNAL)){
+            step = getArguments().getParcelable("step");
+        } else if (TAG.equals(INTERNAL)){
+            step = getArguments().getParcelable("step");
+        }
 
-        tv.setText(step.description);
+        stepList = getArguments().getParcelableArrayList("steps");
+        clickedItemPosition = getArguments().getInt("clickedItemPosition");
+        stepNumber_tv.setText(String.valueOf(clickedItemPosition+1));
+
+        stepDetailDesc_tv.setText(step.getDescription());
+        videoFullScreen();
+
+        shouldAutoPlay = true;
+        bandwidthMeter = new DefaultBandwidthMeter();
+        mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(),
+                "mediaPlayerSample"), (TransferListener<? super DataSource>) bandwidthMeter);
+        window = new Timeline.Window();
+
+        determineWhichWillBeVisible();
+
+        if (!step.getVideoUrl().equals(""))
+            initializePlayer(step);
+
+        if (isLastStep()){
+            nextStepButton.setEnabled(false);
+            nextStepButton.setVisibility(View.INVISIBLE);
+        }
+
+        if (isFirstStep()){
+            previousStepButton.setEnabled(false);
+            previousStepButton.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
+    @OnClick(R.id.previousStepButton)
+    public void showPreviousStep(){
+        clickedItemPosition--;
+        step = stepList.get(clickedItemPosition);
+        releasePlayer();
+        prepareUIForNextAndPreviousSteps();
+        if (isFirstStep()){
+            previousStepButton.setEnabled(false);
+            previousStepButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @OnClick(R.id.nextStepButton)
+    public void showNextStep(){
+        clickedItemPosition++;
+        step = stepList.get(clickedItemPosition);
+        releasePlayer();
+        prepareUIForNextAndPreviousSteps();
+        if (isLastStep()){
+            nextStepButton.setEnabled(false);
+            nextStepButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void prepareUIForNextAndPreviousSteps(){
+        if (!isLastStep()){
+            nextStepButton.setEnabled(true);
+            nextStepButton.setVisibility(View.VISIBLE);
+        }
+        if (!isFirstStep()){
+            previousStepButton.setEnabled(true);
+            previousStepButton.setVisibility(View.VISIBLE);
+        }
+        ((StepDetailActivity)getActivity()).setActionBarTitle(step);
+        stepDetailDesc_tv.setText(step.getDescription());
+        mVideoPosition = 0;
+        stepNumber_tv.setText(String.valueOf(clickedItemPosition));
+        determineWhichWillBeVisible();
+        if (!step.getVideoUrl().equals(""))
+            initializePlayer(step);
+    }
+
+    private boolean isLastStep(){
+        return clickedItemPosition+1 == stepList.size();
+    }
+
+    private boolean isFirstStep(){
+        return clickedItemPosition == 0;
+    }
+
+    private void videoFullScreen(){
         if (isLandscape() && !isVideoNotProvided()) {
             if (getActivity() != null) {
                 hideSystemUI();
@@ -100,18 +199,6 @@ public class StepDetailFragment extends Fragment {
                 simpleExoPlayerView.setLayoutParams(params);
             }
         }
-
-        shouldAutoPlay = true;
-        bandwidthMeter = new DefaultBandwidthMeter();
-        mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(),
-                "mediaPlayerSample"), (TransferListener<? super DataSource>) bandwidthMeter);
-        window = new Timeline.Window();
-
-        determineWhichWillBeVisible();
-
-        if (!step.getVideoUrl().equals(""))
-            initializePlayer();
-
     }
 
     private void determineWhichWillBeVisible() {
@@ -120,13 +207,13 @@ public class StepDetailFragment extends Fragment {
             imageViewIfVideoNotProvided.setVisibility(View.VISIBLE);
             if (isLandscape()){
                 imageViewIfVideoNotProvided.setVisibility(View.GONE);
-                tv.setVisibility(View.VISIBLE);
+                stepDetailDesc_tv.setVisibility(View.VISIBLE);
             }
         } else {
             simpleExoPlayerView.setVisibility(View.VISIBLE);
             imageViewIfVideoNotProvided.setVisibility(View.GONE);
             if (isLandscape()){
-                tv.setVisibility(View.GONE);
+                stepDetailDesc_tv.setVisibility(View.GONE);
             }
         }
     }
@@ -139,7 +226,7 @@ public class StepDetailFragment extends Fragment {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
-    private void initializePlayer() {
+    private void initializePlayer(Step step) {
         simpleExoPlayerView.requestFocus();
 
         TrackSelection.Factory videoTrackSelectionFactory =
@@ -181,6 +268,7 @@ public class StepDetailFragment extends Fragment {
         if (player != null) {
             shouldAutoPlay = player.getPlayWhenReady();
             mVideoPosition = player.getCurrentPosition();
+            player.stop();
             player.release();
             player = null;
             trackSelector = null;
@@ -213,23 +301,23 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (Util.SDK_INT > 23) {
-            initializePlayer();
+        if (player == null) {
+            initializePlayer(step);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if ((Util.SDK_INT <= 23 || player == null)) {
-            initializePlayer();
+        if (player == null) {
+            initializePlayer(step);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (Util.SDK_INT <= 23) {
+        if (player != null) {
             mVideoPosition = player.getCurrentPosition();
             isAlreadyPlaying = player.getPlayWhenReady();
             releasePlayer();
@@ -239,7 +327,7 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (Util.SDK_INT > 23) {
+        if (player != null) {
             releasePlayer();
         }
     }
