@@ -1,5 +1,6 @@
 package com.erayo.baking;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -28,18 +29,27 @@ import butterknife.ButterKnife;
 public class RecipeStepsFragment extends Fragment {
 
     private static final String POSITION = "position";
+    IOnStepPressListener iOnStepPressListener;
 
     @BindView(R.id.recipe_steps_rv)
     RecyclerView recyclerView;
     @BindView(R.id.ingredients_tv)
     TextView tv_ingredients;
-    List<Step> steps;
-    public RecipeStepsFragment(){}
+    static List<Step> steps;
+
+    public RecipeStepsFragment() {
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_recipe_steps, container, false);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        iOnStepPressListener = (IOnStepPressListener) context;
     }
 
     @Override
@@ -51,25 +61,27 @@ public class RecipeStepsFragment extends Fragment {
         Recipe recipe = getArguments().getParcelable("recipe");
         steps = recipe.getSteps();
         initRecyclerView();
-        
+
         ingredients = recipe.getIngredients();
         String ingredientsAppended = "INGREDIENTS" + "\n\n";
-        if (ingredients == null){
+        if (ingredients == null) {
             ingredientsAppended = "Not Available";
         } else {
-            for (int a = 0 ; a < ingredients.size() ; a++) {
+            for (int a = 0; a < ingredients.size(); a++) {
                 Ingredients i = ingredients.get(a);
                 ingredientsAppended += String.valueOf(i.getQuantity()) + " " +
                         i.getMeasure() + " " +
                         i.getIngredient();
-                if (a+1 != ingredients.size()){
+                if (a + 1 != ingredients.size()) {
                     ingredientsAppended += '\n';
                 }
             }
         }
+        if (RecipeStepsActivity.isTwoPane)
+            tv_ingredients.setVisibility(View.GONE);
         tv_ingredients.setText(ingredientsAppended);
-        if(savedInstanceState != null){
-            int position = (int)savedInstanceState.getFloat(POSITION);
+        if (savedInstanceState != null) {
+            int position = (int) savedInstanceState.getFloat(POSITION);
             recyclerView.scrollToPosition(position);
         }
         StepDetailFragment.mVideoPosition = 0;
@@ -82,18 +94,22 @@ public class RecipeStepsFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
-    private void initRecyclerView(){
+    private void initRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         RecipeStepsRecyclerAdapter recipeStepsRecyclerAdapter =
                 new RecipeStepsRecyclerAdapter(steps, new RecipeStepsRecyclerAdapter.ClickListener() {
                     @Override
                     public void onItemClick(int clickedItemPosition) {
-                        Intent intentToStepDetail = new Intent(getActivity(), StepDetailActivity.class);
-                        intentToStepDetail.putParcelableArrayListExtra("steps", (ArrayList<? extends Parcelable>) steps);
-                        intentToStepDetail.putExtra("clickedItemPosition", clickedItemPosition);
-                        StepDetailFragment.TAG = StepDetailFragment.EXTERNAL;
-                        startActivity(intentToStepDetail);
+                        if (RecipeStepsActivity.isTwoPane) {
+                            iOnStepPressListener.onStepPressListener(clickedItemPosition);
+                        } else {
+                            Intent intentToStepDetail = new Intent(getActivity(), StepDetailActivity.class);
+                            intentToStepDetail.putParcelableArrayListExtra("steps", (ArrayList<? extends Parcelable>) steps);
+                            intentToStepDetail.putExtra("clickedItemPosition", clickedItemPosition);
+                            StepDetailFragment.TAG = StepDetailFragment.EXTERNAL;
+                            startActivity(intentToStepDetail);
+                        }
                     }
                 }, getContext());
         recyclerView.setAdapter(recipeStepsRecyclerAdapter);

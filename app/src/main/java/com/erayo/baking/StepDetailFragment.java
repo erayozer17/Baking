@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -69,6 +70,10 @@ public class StepDetailFragment extends Fragment {
     ImageView previousStepButton;
 
     @Nullable
+    @BindView(R.id.nextPreviousBarConsLayout)
+    ConstraintLayout constraintLayout;
+
+    @Nullable
     @BindView(R.id.step_long_description_tv)
     TextView stepDetailDesc_tv;
     @BindView(R.id.stepNumber_tv)
@@ -96,18 +101,24 @@ public class StepDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ButterKnife.bind(this, view);
-        if (TAG.equals(EXTERNAL)){
+        if (TAG.equals(EXTERNAL)) {
             step = getArguments().getParcelable("step");
-        } else if (TAG.equals(INTERNAL)){
+        } else if (TAG.equals(INTERNAL)) {
             step = getArguments().getParcelable("step");
         }
 
         stepList = getArguments().getParcelableArrayList("steps");
         clickedItemPosition = getArguments().getInt("clickedItemPosition");
-        stepNumber_tv.setText(String.valueOf(clickedItemPosition+1));
+        stepNumber_tv.setText(String.valueOf(clickedItemPosition + 1));
+
+        if (step == null) {
+            step = RecipeStepsFragment.steps.get(1); //todo bunu 0 yapmayı unutma
+            stepList = RecipeStepsFragment.steps;
+        }
 
         stepDetailDesc_tv.setText(step.getDescription());
-        videoFullScreen();
+        if (!RecipeStepsActivity.isTwoPane)
+            videoFullScreen();
 
         shouldAutoPlay = true;
         bandwidthMeter = new DefaultBandwidthMeter();
@@ -120,69 +131,85 @@ public class StepDetailFragment extends Fragment {
         if (!step.getVideoUrl().equals(""))
             initializePlayer(step);
 
-        if (isLastStep()){
+        if (isLastStep()) {
             nextStepButton.setEnabled(false);
             nextStepButton.setVisibility(View.INVISIBLE);
         }
 
-        if (isFirstStep()){
+        if (isFirstStep()) {
             previousStepButton.setEnabled(false);
             previousStepButton.setVisibility(View.INVISIBLE);
         }
 
+        if (RecipeStepsActivity.isTwoPane && constraintLayout != null)
+            constraintLayout.setVisibility(View.GONE);
+
     }
 
     @OnClick(R.id.previousStepButton)
-    public void showPreviousStep(){
+    public void showPreviousStep() {
         clickedItemPosition--;
         step = stepList.get(clickedItemPosition);
         releasePlayer();
         prepareUIForNextAndPreviousSteps();
-        if (isFirstStep()){
+        if (isFirstStep()) {
             previousStepButton.setEnabled(false);
             previousStepButton.setVisibility(View.INVISIBLE);
         }
     }
 
     @OnClick(R.id.nextStepButton)
-    public void showNextStep(){
+    public void showNextStep() {
         clickedItemPosition++;
         step = stepList.get(clickedItemPosition);
         releasePlayer();
         prepareUIForNextAndPreviousSteps();
-        if (isLastStep()){
+        if (isLastStep()) {
             nextStepButton.setEnabled(false);
             nextStepButton.setVisibility(View.INVISIBLE);
         }
     }
 
-    private void prepareUIForNextAndPreviousSteps(){
-        if (!isLastStep()){
+    private void prepareUIForNextAndPreviousSteps() {
+        if (!isLastStep()) {
             nextStepButton.setEnabled(true);
             nextStepButton.setVisibility(View.VISIBLE);
         }
-        if (!isFirstStep()){
+        if (!isFirstStep()) {
             previousStepButton.setEnabled(true);
             previousStepButton.setVisibility(View.VISIBLE);
         }
-        ((StepDetailActivity)getActivity()).setActionBarTitle(step);
+        ((StepDetailActivity) getActivity()).setActionBarTitle(step);
         stepDetailDesc_tv.setText(step.getDescription());
         mVideoPosition = 0;
         stepNumber_tv.setText(String.valueOf(clickedItemPosition));
         determineWhichWillBeVisible();
+        if (player != null)
+            player.stop();
         if (!step.getVideoUrl().equals(""))
             initializePlayer(step);
     }
 
-    private boolean isLastStep(){
-        return clickedItemPosition+1 == stepList.size();
+    public void adjustUIForTwoPane(int clickedItemPosition) {
+        step = RecipeStepsFragment.steps.get(clickedItemPosition);
+        stepDetailDesc_tv.setText(step.getDescription());
+        mVideoPosition = 0;
+        determineWhichWillBeVisible();
+        if (player != null)
+            player.stop();
+        if (!step.getVideoUrl().equals(""))
+            initializePlayer(step);
     }
 
-    private boolean isFirstStep(){
+    private boolean isLastStep() {
+        return clickedItemPosition + 1 == stepList.size();
+    }
+
+    private boolean isFirstStep() {
         return clickedItemPosition == 0;
     }
 
-    private void videoFullScreen(){
+    private void videoFullScreen() {
         if (isLandscape() && !isVideoNotProvided()) {
             if (getActivity() != null) {
                 hideSystemUI();
@@ -205,14 +232,14 @@ public class StepDetailFragment extends Fragment {
         if (isVideoNotProvided()) {
             simpleExoPlayerView.setVisibility(View.GONE);
             imageViewIfVideoNotProvided.setVisibility(View.VISIBLE);
-            if (isLandscape()){
+            if (isLandscape()) {
                 imageViewIfVideoNotProvided.setVisibility(View.GONE);
                 stepDetailDesc_tv.setVisibility(View.VISIBLE);
             }
         } else {
             simpleExoPlayerView.setVisibility(View.VISIBLE);
             imageViewIfVideoNotProvided.setVisibility(View.GONE);
-            if (isLandscape()){
+            if (isLandscape()) {
                 stepDetailDesc_tv.setVisibility(View.GONE);
             }
         }
@@ -227,6 +254,8 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void initializePlayer(Step step) {
+        if (player != null)
+            player.stop();
         simpleExoPlayerView.requestFocus();
 
         TrackSelection.Factory videoTrackSelectionFactory =

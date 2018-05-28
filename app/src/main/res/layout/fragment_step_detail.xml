@@ -53,7 +53,7 @@
     </FrameLayout>
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/nextPreviousBarConsLayout"
         android:layout_width="0dp"
         android:layout_height="47dp"
         android:layout_marginBottom="8dp"
