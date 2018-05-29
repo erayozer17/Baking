@@ -5,4 +5,5 @@
     <string name="connection_required">You need internet connection in order to use this app.</string>
     <string name="chef_hat">chef hat</string>
     <string name="add_widget">Set Widget</string>
+    <string name="video_provided_indicator">this shows a video is provided</string>
 </resources>

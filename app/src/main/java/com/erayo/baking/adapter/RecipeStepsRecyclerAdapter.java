@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.erayo.baking.R;
@@ -38,6 +39,11 @@ public class RecipeStepsRecyclerAdapter extends RecyclerView.Adapter<RecipeSteps
         String stepContent = step.getShortDescription();
         holder.listingNumber.setText(String.valueOf(position+1));
         holder.stepContent.setText(stepContent);
+        if (!step.getThumbnailUrl().equals("") || !step.getVideoUrl().equals("")){
+            holder.videoProvided_iv.setVisibility(View.VISIBLE);
+        } else {
+            holder.videoProvided_iv.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -49,11 +55,13 @@ public class RecipeStepsRecyclerAdapter extends RecyclerView.Adapter<RecipeSteps
 
         TextView listingNumber;
         TextView stepContent;
+        ImageView videoProvided_iv;
 
         private ViewHolder(View itemView) {
             super(itemView);
             listingNumber = itemView.findViewById(R.id.list_number_tv);
             stepContent = itemView.findViewById(R.id.step_content_tv);
+            videoProvided_iv = itemView.findViewById(R.id.videoProvided);
             itemView.setOnClickListener(this);
         }
 
