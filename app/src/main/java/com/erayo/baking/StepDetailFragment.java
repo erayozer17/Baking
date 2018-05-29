@@ -112,7 +112,7 @@ public class StepDetailFragment extends Fragment {
         stepNumber_tv.setText(String.valueOf(clickedItemPosition + 1));
 
         if (step == null) {
-            step = RecipeStepsFragment.steps.get(1); //todo bunu 0 yapmayı unutma
+            step = RecipeStepsFragment.steps.get(0);
             stepList = RecipeStepsFragment.steps;
         }
 
