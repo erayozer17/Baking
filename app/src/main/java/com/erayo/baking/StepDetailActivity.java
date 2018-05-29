@@ -1,10 +1,10 @@
 package com.erayo.baking;
 
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.erayo.baking.model.Step;
 
@@ -41,8 +41,6 @@ public class StepDetailActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null)
             fm.beginTransaction().add(R.id.step_detail_frame_layout, stepDetailFragment).commit();
-        else
-            fm.beginTransaction().replace(R.id.step_detail_frame_layout, stepDetailFragment).commit();
         SDA_TAG = POSITIVE;
     }
 
@@ -52,7 +50,7 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    public void setActionBarTitle(Step step){
+    public void setActionBarTitle(Step step) {
         ActionBar ab = getSupportActionBar();
         if (ab != null)
             ab.setTitle(step.getShortDescription());

@@ -44,10 +44,8 @@ public class RecipeStepsActivity extends AppCompatActivity implements IOnStepPre
             stepDetailFragment.setArguments(b);
             FragmentManager fragmentManager = getSupportFragmentManager();
             StepDetailFragment.TAG = StepDetailFragment.EXTERNAL;
-            if (savedInstanceState != null) {
+            if (savedInstanceState == null) {
                 fragmentManager.beginTransaction().add(R.id.mt_dt_step_detail_frame, stepDetailFragment).commit();
-            } else {
-                fragmentManager.beginTransaction().replace(R.id.mt_dt_step_detail_frame, stepDetailFragment).commit();
             }
         }
     }

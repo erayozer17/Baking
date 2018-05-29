@@ -2,7 +2,10 @@ package com.erayo.baking;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,6 +38,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -246,7 +250,19 @@ public class StepDetailFragment extends Fragment {
     }
 
     private boolean isVideoNotProvided() {
-        return step.getVideoUrl().equals("") && step.getThumbnailUrl().equals("");
+        return step.getVideoUrl().equals("");
+    }
+
+    private boolean isVideoProvided() {
+        return !isVideoNotProvided();
+    }
+
+    private boolean isThumbnailProvided() {
+        return step.getThumbnailUrl().equals("");
+    }
+
+    private boolean isThumbnailNotProvided() {
+        return !isThumbnailProvided();
     }
 
     private boolean isLandscape() {
@@ -271,25 +287,37 @@ public class StepDetailFragment extends Fragment {
 
         DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        String url = step.getVideoUrl().equals("") ? step.getThumbnailUrl() : step.getVideoUrl();
+        if (!step.getVideoUrl().equals("")) {
 
-        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(url),
-                mediaDataSourceFactory, extractorsFactory, null, null);
+            String url = step.getVideoUrl();
 
-        player.prepare(mediaSource);
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(url),
+                    mediaDataSourceFactory, extractorsFactory, null, null);
 
-        simpleExoPlayerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                simpleExoPlayerView.hideController();
+            player.prepare(mediaSource);
+
+            simpleExoPlayerView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    simpleExoPlayerView.hideController();
+                }
+            });
+
+            if (mVideoPosition != 0) {
+                player.seekTo(mVideoPosition);
+                player.setPlayWhenReady(isAlreadyPlaying);
+            } else {
+                player.setPlayWhenReady(true);
             }
-        });
-
-        if (mVideoPosition != 0) {
-            player.seekTo(mVideoPosition);
-            player.setPlayWhenReady(isAlreadyPlaying);
         } else {
-            player.setPlayWhenReady(true);
+            //////////////////////////video yok thumbnail varsa buraya girip imageview içine thumbnail atacak todo ...
+            String url = step.getThumbnailUrl();
+            try {
+                Bitmap frame = retriveVideoFrameFromVideo(url);
+                imageViewIfVideoNotProvided.setImageBitmap(frame);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
         }
     }
 
@@ -366,5 +394,26 @@ public class StepDetailFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putLong(CURRENT_VIDEO_SECOND, mVideoPosition);
         outState.putBoolean(IS_VIDEO_PLAYING, isAlreadyPlaying);
+    }
+
+    public static Bitmap retriveVideoFrameFromVideo(String videoPath) throws Throwable {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try {
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+            bitmap = mediaMetadataRetriever.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Throwable("Exception in retriveVideoFrameFromVideo(String videoPath)" + e.getMessage());
+        } finally {
+            if (mediaMetadataRetriever != null) {
+                mediaMetadataRetriever.release();
+            }
+        }
+        return bitmap;
     }
 }

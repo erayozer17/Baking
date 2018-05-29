@@ -20,7 +20,7 @@ public class RecipeStepsRecyclerAdapter extends RecyclerView.Adapter<RecipeSteps
     private LayoutInflater mInflater;
     final private ClickListener clickListener;
 
-    public RecipeStepsRecyclerAdapter(List<Step> stepList, ClickListener clickListener, Context context){
+    public RecipeStepsRecyclerAdapter(List<Step> stepList, ClickListener clickListener, Context context) {
         this.stepList = stepList;
         this.clickListener = clickListener;
         mInflater = LayoutInflater.from(context);
@@ -37,9 +37,9 @@ public class RecipeStepsRecyclerAdapter extends RecyclerView.Adapter<RecipeSteps
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Step step = stepList.get(position);
         String stepContent = step.getShortDescription();
-        holder.listingNumber.setText(String.valueOf(position+1));
+        holder.listingNumber.setText(String.valueOf(position + 1));
         holder.stepContent.setText(stepContent);
-        if (!step.getThumbnailUrl().equals("") || !step.getVideoUrl().equals("")){
+        if (!step.getVideoUrl().equals("")) {
             holder.videoProvided_iv.setVisibility(View.VISIBLE);
         } else {
             holder.videoProvided_iv.setVisibility(View.INVISIBLE);
@@ -51,7 +51,7 @@ public class RecipeStepsRecyclerAdapter extends RecyclerView.Adapter<RecipeSteps
         return stepList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView listingNumber;
         TextView stepContent;
@@ -72,7 +72,7 @@ public class RecipeStepsRecyclerAdapter extends RecyclerView.Adapter<RecipeSteps
         }
     }
 
-    public interface ClickListener{
+    public interface ClickListener {
         void onItemClick(int clickedItemPosition);
     }
 }
